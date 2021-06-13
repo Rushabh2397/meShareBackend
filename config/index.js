@@ -3,5 +3,6 @@ require('dotenv').config()
 module.exports={
     "port": process.env.PORT,
     "connectionString" : process.env.CONNECTION_STRING,
-    "secret" : process.env.SECRET
+    "secret" : process.env.SECRET,
+    "docUrl": process.env.DOC_URL
 }

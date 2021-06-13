@@ -2,6 +2,7 @@ const async = require('async')
 const Uploader = require('../support/uploader')
 const Document = require('../models/document')
 const path = require('path')
+const config = require('../config')
 
 module.exports = {
 
@@ -36,7 +37,7 @@ module.exports = {
                             },
                             (cb) => {
                                 let doc = new Document({
-                                    user_name: 'abc',
+                                    user_name: req.user._id,
                                     type: 'image',
                                     file_name: fileName,
                                 })
@@ -70,7 +71,7 @@ module.exports = {
                             },
                             (cb) => {
                                 let doc = new Document({
-                                    user_name: 'abc',
+                                    user_name: req.user_id,
                                     type: 'doc',
                                     file_name: fileName,
                                 })
@@ -122,7 +123,7 @@ module.exports = {
             },
             (body, nextCall) => {
                 let url = new Document({
-                    user_name: 'abc',
+                    user_name: req.user._id,
                     type: 'url',
                     url: body.url,
                 })
@@ -143,6 +144,90 @@ module.exports = {
             res.json({
                 status: 'success',
                 message: 'Url added successfully.'
+            })
+        })
+    },
+
+    getImages: (req,res) => {
+        async.waterfall([
+            (nextCall) => {
+                Document.find({ type: 'image' }).sort({ created_at: -1 }).exec((err, images) => {
+                    if (err) {
+                        return nextCall(err)
+                    }
+                    images.map(img => {
+                        img.file_name = config.docUrl + 'image/' + img.file_name
+                    })
+
+                    nextCall(null, images)
+                })
+            }
+        ], (err, response) => {
+            if (err) {
+                return res.status(400).json({
+                    message: (err && err.message) || 'Oops! Failed to get images.'
+                })
+            }
+
+            res.json({
+                status: 'success.',
+                message: 'Image list.',
+                data: response
+            })
+        })
+    },
+
+    getDocs: (req, res) => {
+        async.waterfall([
+            (nextCall) => {
+                Document.find({ type: 'doc' }).sort({ created_at: -1 }).exec((err, doc) => {
+                    if (err) {
+                        return nextCall(err)
+                    }
+                    doc.map(doc => {
+                        doc.file_name = config.docUrl + 'document/' + doc.file_name
+                    })
+
+                    nextCall(null, doc)
+                })
+            }
+        ], (err, response) => {
+            if (err) {
+                return res.status(400).json({
+                    message: (err && err.message) || 'Oops! Failed to get documents.'
+                })
+            }
+
+            res.json({
+                status: 'success.',
+                message: 'Document list.',
+                data: response
+            })
+        })
+    },
+
+    getUrl: (req, res) => {
+        async.waterfall([
+            (nextCall) => {
+                Document.find({ type: 'url' }).sort({ created_at: -1 }).exec((err, urls) => {
+                    if (err) {
+                        return nextCall(err)
+                    }
+
+                    nextCall(null, urls)
+                })
+            }
+        ], (err, response) => {
+            if (err) {
+                return res.status(400).json({
+                    message: (err && err.message) || 'Oops! Failed to get urls.'
+                })
+            }
+
+            res.json({
+                status: 'success.',
+                message: 'urls list.',
+                data: response
             })
         })
     }

@@ -8,7 +8,6 @@ const config = require('../config')
 module.exports = {
 
     register: (req, res) => {
-        console.log("inside register")
         async.waterfall([
             (nextCall) => {
                 const errors = validationResult(req);
@@ -78,7 +77,7 @@ module.exports = {
             },
             (user, nextCall) => {
                 let jwtData = {
-                    id: user._id,
+                    _id: user._id,
                     user_name: user.user_name
                 }
                 user = user.toJSON()
