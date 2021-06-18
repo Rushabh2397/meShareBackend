@@ -3,7 +3,8 @@ const Uploader = require('../support/uploader')
 const Document = require('../models/document')
 const path = require('path')
 const config = require('../config')
-
+const {validationResult} = require('express-validator')
+const socketConnect = require('../support/socket')
 module.exports = {
 
     addDocuments: (req, res) => {
@@ -20,13 +21,16 @@ module.exports = {
                 nextCall(null, fields, files);
             },
             (fields, files, nextCall) => {
+                if(!Array.isArray(files.doc)){ 
+                    files.doc=[files.doc]
+                }
                 async.mapSeries(files.doc, (k, nextFile) => {
                     if (k.type.indexOf('image') != -1) {
                         let fileName = Date.now() + k.name
                         async.series([
                             (cb) => {
                                 let options = {
-                                    dst: path.join(__dirname, '../', 'uploads/image/'),
+                                    dst: path.join(__dirname, '../', 'uploads/document/'),
                                     src: k.path,
                                     fileName: fileName
                                 }
@@ -40,6 +44,7 @@ module.exports = {
                                     user_name: req.user._id,
                                     type: 'image',
                                     file_name: fileName,
+                                    original_name : k.name
                                 })
                                 doc.save((err, data) => {
                                     if (err) {
@@ -74,6 +79,7 @@ module.exports = {
                                     user_name: req.user_id,
                                     type: 'doc',
                                     file_name: fileName,
+                                    original_name : k.name
                                 })
                                 doc.save((err, data) => {
                                     if (err) {
@@ -151,12 +157,12 @@ module.exports = {
     getImages: (req,res) => {
         async.waterfall([
             (nextCall) => {
-                Document.find({ type: 'image' }).sort({ created_at: -1 }).exec((err, images) => {
+                Document.find({}).sort({ created_at: -1 }).exec((err, images) => {
                     if (err) {
                         return nextCall(err)
                     }
                     images.map(img => {
-                        img.file_name = config.docUrl + 'image/' + img.file_name
+                        img.file_name = config.docUrl + 'document/' + img.file_name
                     })
 
                     nextCall(null, images)

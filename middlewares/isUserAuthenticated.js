@@ -5,9 +5,9 @@ const config = require('../config')
 module.exports = (req, res, next) => {
   
   let token = req.headers ? req.headers['token'] : ''
-   console.log("token",token)
+  
   jwt.verify(token, config.secret, (err, tok) => {
-      console.log("tok",tok)
+
     if (err) {
       res.status(401).json({
         message: err.message

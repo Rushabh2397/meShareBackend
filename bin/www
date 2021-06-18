@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('mesharebackend:server');
 var http = require('http');
 const config = require('../config')
+const socketConnect  = require('../support/socket')
 
 /**
  * Get port from environment and store in Express.
@@ -87,6 +88,8 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
+
+  socketConnect(server)  
   debug('Listening on ' + bind);
   console.log('Listening on ' + bind);
 }

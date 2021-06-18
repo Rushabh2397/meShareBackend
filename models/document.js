@@ -9,6 +9,9 @@ let schema = new mongoose.Schema({
     type:{
         type: String
     },
+    original_name:{
+        type: String
+    },
     file_name:{
         type: String
     },
