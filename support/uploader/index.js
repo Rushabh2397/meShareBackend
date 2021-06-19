@@ -59,5 +59,8 @@ module.exports = {
             }
             cb()
         })
+    },
+    removeWithoutCb :(dst)=>{
+        fse.removeSync(dst)
     }
 }

@@ -4,7 +4,6 @@ const Document = require('../models/document')
 const path = require('path')
 const config = require('../config')
 const {validationResult} = require('express-validator')
-const socketConnect = require('../support/socket')
 module.exports = {
 
     addDocuments: (req, res) => {

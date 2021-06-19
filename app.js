@@ -3,7 +3,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors')
-const mod = require('./controllers/socket')
+const Cron = require('./controllers/cron')
 const docRouter = require('./routes/document');
 const usersRouter = require('./routes/users');
 
@@ -18,5 +18,7 @@ app.use('/uploads',express.static(path.join(__dirname, 'uploads')));
 
 app.use('/doc', docRouter);
 app.use('/user', usersRouter);
+
+Cron.cronTask()
 
 module.exports = app;
