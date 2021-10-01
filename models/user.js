@@ -4,9 +4,8 @@ const moment = require('moment')
 const { encrypt } = require('../utils/encrypt_decrypt')
 
 let schema = new mongoose.Schema({
-    user_name:{
-        type: String,
-        unique: true
+    email:{
+        type: String
     },
     password:{
         type: String

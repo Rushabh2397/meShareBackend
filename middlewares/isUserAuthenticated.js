@@ -16,7 +16,6 @@ module.exports = (req, res, next) => {
       req.user = tok
       next()
     } else {
-        console.log("here")
       res.status(401).json({
         message: 'something wrong.'
       })

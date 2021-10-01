@@ -17,11 +17,11 @@ module.exports = {
                 nextCall(null, req.body)
             },
             (body, nextCall) => {
-                User.findOne({ user_name: body.user_name }, (err, user) => {
+                User.findOne({ email: body.email }, (err, user) => {
                     if (err) {
                         nextCall(err)
                     } else if (user) {
-                        nextCall({ message: 'User name already exist.' })
+                        nextCall({ message: 'Email already exist.' })
                     } else {
                         nextCall(null, body)
                     }
@@ -60,7 +60,7 @@ module.exports = {
                 nextCall(null, req.body)
             },
             (body, nextCall) => {
-                User.findOne({ user_name: body.user_name }, (err, user) => {
+                User.findOne({ email: body.email }, (err, user) => {
                     if (err) {
                         return nextCall(err)
                     } else if (!user) {
@@ -78,12 +78,13 @@ module.exports = {
             (user, nextCall) => {
                 let jwtData = {
                     _id: user._id,
-                    user_name: user.user_name
+                    email: user.email
                 }
                 user = user.toJSON()
                 user.token = jwt.sign(jwtData, config.secret, {
                     expiresIn: 60 * 60 * 24 
                 })
+                delete user['password']
                 nextCall(null,user)
             }
         ], (err, response) => {

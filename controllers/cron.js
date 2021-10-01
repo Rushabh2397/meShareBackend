@@ -62,7 +62,6 @@ let _self = {
 
     cronTask: () => {
         let task = cron.schedule('* * * * *', () => {
-            console.log("called")
             _self.removeFile()
         }, {
             scheduled: false

@@ -15,7 +15,7 @@ let schema = new mongoose.Schema({
     file_name:{
         type: String
     },
-    url :{
+    text :{
         type: String
     },
     created_at: {

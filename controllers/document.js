@@ -3,7 +3,8 @@ const Uploader = require('../support/uploader')
 const Document = require('../models/document')
 const path = require('path')
 const config = require('../config')
-const {validationResult} = require('express-validator')
+const { validationResult } = require('express-validator')
+const isUrl = require('is-url')
 module.exports = {
 
     addDocuments: (req, res) => {
@@ -20,8 +21,8 @@ module.exports = {
                 nextCall(null, fields, files);
             },
             (fields, files, nextCall) => {
-                if(!Array.isArray(files.doc)){ 
-                    files.doc=[files.doc]
+                if (!Array.isArray(files.doc)) {
+                    files.doc = [files.doc]
                 }
                 async.mapSeries(files.doc, (k, nextFile) => {
                     if (k.type.indexOf('image') != -1) {
@@ -40,10 +41,10 @@ module.exports = {
                             },
                             (cb) => {
                                 let doc = new Document({
-                                    user_name: req.user._id,
+                                    // user_name: req.user._id,
                                     type: 'image',
                                     file_name: fileName,
-                                    original_name : k.name
+                                    original_name: k.name
                                 })
                                 doc.save((err, data) => {
                                     if (err) {
@@ -75,10 +76,10 @@ module.exports = {
                             },
                             (cb) => {
                                 let doc = new Document({
-                                    user_name: req.user_id,
+                                    //user_name: req.user_id,
                                     type: 'doc',
                                     file_name: fileName,
-                                    original_name : k.name
+                                    original_name: k.name
                                 })
                                 doc.save((err, data) => {
                                     if (err) {
@@ -153,7 +154,7 @@ module.exports = {
         })
     },
 
-    getImages: (req,res) => {
+    getAllFiles: (req, res) => {
         async.waterfall([
             (nextCall) => {
                 Document.find({}).sort({ created_at: -1 }).exec((err, images) => {
@@ -175,7 +176,7 @@ module.exports = {
             }
 
             res.json({
-                status: 'success.',
+                status: 'success',
                 message: 'Image list.',
                 data: response
             })
@@ -230,8 +231,47 @@ module.exports = {
             }
 
             res.json({
-                status: 'success.',
+                status: 'success',
                 message: 'urls list.',
+                data: response
+            })
+        })
+    },
+
+    addUserText: (req, res) => {
+        async.waterfall([
+            (nextCall) => {
+                if (!req.body.text) {
+                    return nextCall({
+                        message: 'Text is reqiured.'
+                    })
+                }
+                nextCall(null, req.body)
+            },
+            (body, nextCall) => {
+                let type = isUrl(body.text) ? 'url' : 'text';
+                let doc = new Document({
+                    type: type,
+                    text: body.text
+                })
+
+                doc.save((err,savedText)=>{
+                    if(err){
+                        return nextCall(err)
+                    }
+                    nextCall(null,savedText)
+                })
+            }
+        ], (err, response) => { 
+            if(err){
+                return res.status(400).json({
+                    message : (err && err.message) || 'Oops! Failed to save the text.'
+                })
+            }
+
+            res.json({
+                status:'success',
+                message :'Text/Url saved.',
                 data: response
             })
         })

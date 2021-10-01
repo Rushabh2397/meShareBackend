@@ -5,14 +5,14 @@ module.exports={
 
     register: ()=>{
         return([
-            check('user_name','User name is required.').notEmpty(),
+            check('email','Email is required.').notEmpty(),
             check('password','Password is required.').notEmpty()
         ])
     },
     
     login: ()=>{
         return([
-            check('user_name','User name is required.').notEmpty(),
+            check('email','Email name is required.').notEmpty(),
             check('password','Password is required.').notEmpty()
         ])
     },

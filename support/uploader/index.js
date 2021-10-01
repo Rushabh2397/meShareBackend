@@ -6,16 +6,19 @@ const sharp = require('sharp');
 module.exports = {
 
     getFormData: (req, cb) => {
+        //console.log("req",req)
         let form = formidable.IncomingForm()
         form.multiples = true;
         form.uploadDir = path.join(__dirname, '../../', 'uploads/temp')
         fse.ensureDir(form.uploadDir, (err) => {
             if (err) {
+                console.log("err",err)
                 return cb(err)
             }
 
             form.parse(req, (err, fields, files) => {
                 if (err) {
+                    console.log("err",err)
                     return cb(err)
                 }
                 cb(null, fields, files)

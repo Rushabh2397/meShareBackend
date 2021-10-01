@@ -19,6 +19,6 @@ app.use('/uploads',express.static(path.join(__dirname, 'uploads')));
 app.use('/doc', docRouter);
 app.use('/user', usersRouter);
 
-Cron.cronTask()
+// Cron.cronTask()
 
 module.exports = app;
