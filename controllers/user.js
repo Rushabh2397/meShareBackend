@@ -1,8 +1,8 @@
 const async = require('async');
 const user = require('../models/user');
 const User = require('../models/user')
-const { decrypt } = require('../utils/encrypt_decrypt')
-const { validationResult} = require('express-validator')
+const { decrypt, encrypt } = require('../utils/encrypt_decrypt')
+const { validationResult } = require('express-validator')
 const jwt = require('jsonwebtoken')
 const config = require('../config')
 module.exports = {
@@ -33,7 +33,7 @@ module.exports = {
                     if (err) {
                         return nextCall(err)
                     }
-                    nextCall(null,data)
+                    nextCall(null, data)
                 })
             }
         ], (err, response) => {
@@ -82,10 +82,10 @@ module.exports = {
                 }
                 user = user.toJSON()
                 user.token = jwt.sign(jwtData, config.secret, {
-                    expiresIn: 60 * 60 * 24 
+                    expiresIn: 60 * 60 * 24
                 })
                 delete user['password']
-                nextCall(null,user)
+                nextCall(null, user)
             }
         ], (err, response) => {
             if (err) {
@@ -98,6 +98,55 @@ module.exports = {
                 status: 'success',
                 message: 'User logged in successfully.',
                 data: response
+            })
+        })
+    },
+
+    changePassword : (req, res) => {
+        async.waterfall([
+            (nextCall) => {
+                if (!req.body.password || !req.body.newPassword) {
+                    return nextCall({
+                        message: 'All fileds are required.'
+                    })
+                }
+
+                nextCall(null, req.body)
+            },
+            (body, nextCall) => {
+                User.findById(req.user._id, (err, user) => {
+                    if (err) {
+                        return nextCall(err)
+                    }
+                    nextCall(null, body,user)
+                })
+            },
+            (body,user, nextCall) => {
+                let passwordMatched = decrypt(body.password, user.password)
+                let newPassword = encrypt(body.newPassword)
+                if (passwordMatched) {
+                    User.findByIdAndUpdate(user._id, { password: newPassword }, (err, updatedUser) => {
+                        if (err) {
+                            return nextCall(err)
+                        }
+                        nextCall(null, null)
+                    })
+                } else {
+                    nextCall({
+                        message: "Your old password doesn't match."
+                    })
+                }
+            }
+        ], (err, response) => {
+            if (err) {
+                return res.status(400).json({
+                    message: (err && err.message) || 'Oops! Failed to update password.'
+                })
+            }
+
+            res.json({
+                status: 'success',
+                message: 'Password updated successfully.'
             })
         })
     }

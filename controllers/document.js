@@ -41,7 +41,7 @@ module.exports = {
                             },
                             (cb) => {
                                 let doc = new Document({
-                                    // user_name: req.user._id,
+                                    user_id: req.user._id,
                                     type: 'image',
                                     file_name: fileName,
                                     original_name: k.name
@@ -76,7 +76,7 @@ module.exports = {
                             },
                             (cb) => {
                                 let doc = new Document({
-                                    //user_name: req.user_id,
+                                    user_id: req.user._id,
                                     type: 'doc',
                                     file_name: fileName,
                                     original_name: k.name
@@ -157,7 +157,7 @@ module.exports = {
     getAllFiles: (req, res) => {
         async.waterfall([
             (nextCall) => {
-                Document.find({}).sort({ created_at: -1 }).exec((err, images) => {
+                Document.find({user_id:req.user._id}).sort({ created_at: -1 }).exec((err, images) => {
                     if (err) {
                         return nextCall(err)
                     }
@@ -251,6 +251,7 @@ module.exports = {
             (body, nextCall) => {
                 let type = isUrl(body.text) ? 'url' : 'text';
                 let doc = new Document({
+                    user_id:req.user._id,
                     type: type,
                     text: body.text
                 })

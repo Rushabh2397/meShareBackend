@@ -19,6 +19,13 @@ app.use('/uploads',express.static(path.join(__dirname, 'uploads')));
 app.use('/doc', docRouter);
 app.use('/user', usersRouter);
 
-// Cron.cronTask()
+app.use('/',express.static(path.join(__dirname, 'website')));
+
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'website', 'index.html'));
+});
+
+
+Cron.cronTask()
 
 module.exports = app;
