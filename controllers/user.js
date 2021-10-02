@@ -54,7 +54,7 @@ module.exports = {
     login: (req, res) => {
         async.waterfall([
             (nextCall) => {
-                req.body.email = req.body.email.totoLowerCase();
+                req.body.email = req.body.email.toLowerCase();
                 const errors = validationResult(req);
                 if (!errors.isEmpty()) {
                     return nextCall({ message: errors.errors[0].msg });
